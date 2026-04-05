@@ -2,13 +2,13 @@ from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, Annotated
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_groq import ChatGroq
-from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 from langchain_tavily import TavilySearch
 from langchain_core.tools import tool
 from dotenv import load_dotenv
-import sqlite3
+
 import requests
 import os
 
@@ -83,8 +83,7 @@ tool_node = ToolNode(tools)
 # -------------------
 # 5. Checkpointer
 # -------------------
-conn = sqlite3.connect(database="chatbot.db", check_same_thread=False)
-checkpointer = SqliteSaver(conn=conn)
+checkpointer = MemorySaver()
 
 # -------------------
 # 6. Graph
