@@ -21,7 +21,11 @@ search_tool = TavilySearch(max_results=3)
 
 
 @tool
-def calculator(first_num: float, second_num: float, operation: str) -> dict:
+def calculator(first_num: float, second_num: float, operation: str) -> str:
+    """
+    Perform a basic arithmetic operation on two numbers.
+    Supported operations: add, sub, mul, div
+    """
     try:
         if operation == "add":
             result = first_num + second_num
@@ -31,21 +35,29 @@ def calculator(first_num: float, second_num: float, operation: str) -> dict:
             result = first_num * second_num
         elif operation == "div":
             if second_num == 0:
-                return {"error": "Division by zero is not allowed"}
+                return "Error: Division by zero is not allowed"
             result = first_num / second_num
         else:
-            return {"error": f"Unsupported operation '{operation}'"}
+            return f"Error: Unsupported operation '{operation}'"
         
-        return {"first_num": first_num, "second_num": second_num, "operation": operation, "result": result}
+        return f"Result of {first_num} {operation} {second_num} = {result}"
     except Exception as e:
-        return {"error": str(e)}
+        return f"Error: {str(e)}"
 
 
 @tool
-def get_stock_price(symbol: str) -> dict:
+def get_stock_price(symbol: str) -> str:
+    """
+    Fetch the latest stock price for a given symbol (e.g. 'AAPL', 'TSLA').
+    Returns the stock quote information.
+    """
     url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey=C9PE94QUEW9VWGFM"
     r = requests.get(url)
-    return r.json()
+    data = r.json()
+    if "Global Quote" in data and data["Global Quote"]:
+        quote = data["Global Quote"]
+        return f"{symbol}: ${quote.get('05. price', 'N/A')} (Change: {quote.get('10. change percent', 'N/A')})"
+    return f"Could not fetch data for {symbol}"
 
 
 tools = [search_tool, get_stock_price, calculator]
